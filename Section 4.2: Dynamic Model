@@ -1,4 +1,4 @@
-mport numpy as np
+import numpy as np
 import pandas as pd
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
@@ -34,8 +34,6 @@ def baseline_rate(t):
     return 0.02
 
 # CQD index
-
-
 def CQD_C(t):
     """
     Credit-quality deterioration index:
