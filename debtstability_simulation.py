@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 # Core settings           #
 # ------------------------ #
 kappa0, kappa_r = 0.5, 0.2
-sR = 0.6
+sR = 0.6 
 tau0 = 0.2
 sf = 0.2
 theta = 0.3
@@ -44,8 +44,6 @@ def baseline_rate(t):
     return 0.02
 
 # CQD index
-
-
 def CQD_C(t):
     """
     Credit-quality deterioration index:
@@ -61,22 +59,22 @@ def D_W_star(D_W, W, i, t):
     credit_tight = (1 - K) * CQD_C(t)
     return net_wage - debt_service - credit_tight
 
-# RHS of ODE
+
 def rhs(t, y, rate_func, theta_func, kappa0_func, markup_sens):
-    dF, dW = y
-    i = rate_func(t)
-    th = theta_func(t)
-    kap0 = kappa0_func(t)
+    dF, dW = y                                   """ Corporate Leverage Ratıo and Household Leverage Ratıo"""
+    i = rate_func(t)                             """Interest Rate""""
+    th = theta_func(t)                            """" Speed of debt-adjustment""""
+    kap0 = kappa0_func(t)                         """"Animal Spirit""""
     tau = tau0 + markup_sens * i
     pi = tau / (1 + tau)
     W = 1 - pi
-    Df_star = 0.2
-    Dw_star = D_W_star(dW, W, i, t)
-    fg = sR * i * (dW + dF) - th * (Df_star - dF)
+    Df_star = 0.2                                    """"Target corporate debt (0.2 fixed)""""
+    Dw_star = D_W_star(dW, W, i, t)                 """"Target household debt, calculated semi-endogenously (from Eq. 31) in Isaac & Kim)""""
+    fg = sR * i * (dW + dF) - th * (Df_star - dF)   """"Rentier Saving""""
     household_flow = th * (Dw_star - dW)
-    dF_dot = (((1 - kappa_r + kappa_r * dF) * fg - kap0 * dF)
+    dF_dot = (((1 - kappa_r + kappa_r * dF) * fg - kap0 * dF)       """"Corporate Debt Dynamics""""
               - household_flow) / (1 - kappa_r)
-    dW_dot = household_flow
+    dW_dot = household_flow                                         """" Households Debt Dynamics""""
     return [dF_dot, dW_dot]
 
 # Simulation function
@@ -107,18 +105,20 @@ def simulate(rate_func, theta_func=lambda t: theta,
 i0 = baseline_rate(0)
 dF0, dW0 = 0.2, D_W_star(0, 1 - (tau0/(1+tau0)), i0, 0)
 
-# Shock schedules
+""""Shocks""""
 rate_IR    = lambda t: baseline_rate(t) + (0.01 if t >= 4 else 0.0)
 theta_loose = lambda t: theta * 1.10 if t >= 7 else theta
 kap0_boost  = lambda t: kappa0 + 0.5 if t >= 10 else kappa0
 
-# Run simulations
+""""Run Simulation""""
 baseline_df = simulate(baseline_rate, y0=(dF0, dW0))
 ir_df       = simulate(rate_IR, y0=(dF0, dW0))
 theta_df    = simulate(baseline_rate, theta_func=theta_loose, y0=(dF0, dW0))
 kap_df      = simulate(baseline_rate, kappa0_func=kap0_boost, y0=(dF0, dW0))
 flex_df     = simulate(baseline_rate, markup_sens=markup_flex, y0=(dF0, dW0))
 rigid_df    = simulate(baseline_rate, markup_sens=markup_rigid, y0=(dF0, dW0))
+
+
 # ------------------------ #
 # 8. Plotting              #
 # ------------------------ #
